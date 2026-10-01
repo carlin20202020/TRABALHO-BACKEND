@@ -1,0 +1,765 @@
+{
+  "info": {
+    "name": "SGOA - API de Ocorrências Escolares",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "salaId",
+      "value": ""
+    },
+    {
+      "key": "equipamentoId",
+      "value": ""
+    },
+    {
+      "key": "ocorrenciaId",
+      "value": ""
+    },
+    {
+      "key": "usuarioId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "0. Login (guarda o token sozinho)",
+      "item": [
+        {
+          "name": "Login - Administrador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j.token) pm.collectionVariables.set('token', j.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@escola.pr.gov.br\",\n  \"senha\": \"Senha@123\"\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "Login - Professor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j.token) pm.collectionVariables.set('token', j.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"professor@escola.pr.gov.br\",\n  \"senha\": \"Senha@123\"\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "Login - Aluno",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j.token) pm.collectionVariables.set('token', j.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"aluno@escola.pr.gov.br\",\n  \"senha\": \"Senha@123\"\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "Quem sou eu",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/auth/me"
+          }
+        }
+      ]
+    },
+    {
+      "name": "1. Cadastro e usuários",
+      "item": [
+        {
+          "name": "Registro público - Aluno (matrícula válida)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Carlos Pereira\",\n  \"email\": \"carlos@aluno.com\",\n  \"senha\": \"Senha@123\",\n  \"matricula\": \"123456789\",\n  \"perfil\": \"Aluno\"\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "url": "{{baseUrl}}/auth/registro"
+          }
+        },
+        {
+          "name": "Registro - matrícula INVÁLIDA (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Carlos Pereira\",\n  \"email\": \"carlos2@aluno.com\",\n  \"senha\": \"Senha@123\",\n  \"matricula\": \"12ab\",\n  \"perfil\": \"Aluno\"\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "url": "{{baseUrl}}/auth/registro"
+          }
+        },
+        {
+          "name": "Registro como Administrador (403 - só existe 1)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Outro Admin\",\n  \"email\": \"outro@admin.com\",\n  \"senha\": \"Senha@123\",\n  \"matricula\": \"987654321\",\n  \"perfil\": \"Administrador\"\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "url": "{{baseUrl}}/auth/registro"
+          }
+        },
+        {
+          "name": "[Admin] Criar professor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j.usuario && j.usuario.id) pm.collectionVariables.set('usuarioId', j.usuario && j.usuario.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Nova Professora\",\n  \"email\": \"nova@escola.pr.gov.br\",\n  \"senha\": \"Senha@123\",\n  \"matricula\": \"555555555\",\n  \"perfil\": \"Professor\"\n}"
+            },
+            "url": "{{baseUrl}}/usuarios"
+          }
+        },
+        {
+          "name": "[Admin] Listar contas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/usuarios"
+          }
+        },
+        {
+          "name": "[Admin] Editar usuário",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Nome Atualizado\"\n}"
+            },
+            "url": "{{baseUrl}}/usuarios/{{usuarioId}}"
+          }
+        },
+        {
+          "name": "[Admin] Redefinir senha (gera senha temporária)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/usuarios/{{usuarioId}}/redefinir-senha"
+          }
+        },
+        {
+          "name": "[Admin] Excluir usuário",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/usuarios/{{usuarioId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Salas e equipamentos (só Admin altera)",
+      "item": [
+        {
+          "name": "[Admin] Criar sala",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j.sala && j.sala.id) pm.collectionVariables.set('salaId', j.sala && j.sala.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Laboratório de Informática 3\",\n  \"descricao\": \"Novo laboratório\"\n}"
+            },
+            "url": "{{baseUrl}}/salas"
+          }
+        },
+        {
+          "name": "Listar salas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/salas"
+          }
+        },
+        {
+          "name": "[Admin] Renomear sala",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Laboratório de Informática 3B\"\n}"
+            },
+            "url": "{{baseUrl}}/salas/{{salaId}}"
+          }
+        },
+        {
+          "name": "[Admin] Criar equipamento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j.equipamento && j.equipamento.id) pm.collectionVariables.set('equipamentoId', j.equipamento && j.equipamento.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Computador 10\",\n  \"tipo\": \"Computador\",\n  \"numero_patrimonio\": \"200010\",\n  \"sala_id\": \"{{salaId}}\"\n}"
+            },
+            "url": "{{baseUrl}}/equipamentos"
+          }
+        },
+        {
+          "name": "Criar equipamento como Professor/Aluno (403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"PC X\",\n  \"tipo\": \"Computador\",\n  \"sala_id\": \"{{salaId}}\"\n}"
+            },
+            "url": "{{baseUrl}}/equipamentos"
+          }
+        },
+        {
+          "name": "Listar equipamentos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/equipamentos"
+          }
+        },
+        {
+          "name": "[Admin] Editar equipamento",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Em Manutenção\"\n}"
+            },
+            "url": "{{baseUrl}}/equipamentos/{{equipamentoId}}"
+          }
+        },
+        {
+          "name": "[Admin] Excluir equipamento",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/equipamentos/{{equipamentoId}}"
+          }
+        },
+        {
+          "name": "[Admin] Excluir sala",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/salas/{{salaId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Ocorrências",
+      "item": [
+        {
+          "name": "Aluno tenta abrir chamado (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j.ocorrencia && j.ocorrencia.id) pm.collectionVariables.set('ocorrenciaId', j.ocorrencia && j.ocorrencia.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "titulo",
+                  "value": "Monitor quebrado",
+                  "type": "text"
+                },
+                {
+                  "key": "descricao",
+                  "value": "A tela não liga mais",
+                  "type": "text"
+                },
+                {
+                  "key": "categoria",
+                  "value": "Hardware Quebrado",
+                  "type": "text"
+                },
+                {
+                  "key": "equipamento_id",
+                  "value": "{{equipamentoId}}",
+                  "type": "text"
+                },
+                {
+                  "key": "foto",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": "{{baseUrl}}/ocorrencias"
+          }
+        },
+        {
+          "name": "[Professor] Hardware Quebrado SEM foto (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j.ocorrencia && j.ocorrencia.id) pm.collectionVariables.set('ocorrenciaId', j.ocorrencia && j.ocorrencia.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "titulo",
+                  "value": "Monitor quebrado",
+                  "type": "text"
+                },
+                {
+                  "key": "descricao",
+                  "value": "A tela não liga mais",
+                  "type": "text"
+                },
+                {
+                  "key": "categoria",
+                  "value": "Hardware Quebrado",
+                  "type": "text"
+                },
+                {
+                  "key": "equipamento_id",
+                  "value": "{{equipamentoId}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": "{{baseUrl}}/ocorrencias"
+          }
+        },
+        {
+          "name": "[Professor] Hardware Quebrado COM foto (escolha o arquivo em \"foto\")",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j.ocorrencia && j.ocorrencia.id) pm.collectionVariables.set('ocorrenciaId', j.ocorrencia && j.ocorrencia.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "titulo",
+                  "value": "Monitor quebrado",
+                  "type": "text"
+                },
+                {
+                  "key": "descricao",
+                  "value": "A tela não liga mais",
+                  "type": "text"
+                },
+                {
+                  "key": "categoria",
+                  "value": "Hardware Quebrado",
+                  "type": "text"
+                },
+                {
+                  "key": "equipamento_id",
+                  "value": "{{equipamentoId}}",
+                  "type": "text"
+                },
+                {
+                  "key": "foto",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": "{{baseUrl}}/ocorrencias"
+          }
+        },
+        {
+          "name": "[Professor] Abrir \"Sem Internet\" (JSON)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j.ocorrencia && j.ocorrencia.id) pm.collectionVariables.set('ocorrenciaId', j.ocorrencia && j.ocorrencia.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Sem internet\",\n  \"descricao\": \"A rede caiu no laboratório\",\n  \"categoria\": \"Sem Internet\",\n  \"equipamento_id\": \"{{equipamentoId}}\"\n}"
+            },
+            "url": "{{baseUrl}}/ocorrencias"
+          }
+        },
+        {
+          "name": "Listar ocorrências (aluno: ativas | professor: as suas | admin: todas)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/ocorrencias"
+          }
+        },
+        {
+          "name": "Buscar ocorrência",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/ocorrencias/{{ocorrenciaId}}"
+          }
+        },
+        {
+          "name": "[Admin] Editar ocorrência",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Sem internet no laboratório 3\"\n}"
+            },
+            "url": "{{baseUrl}}/ocorrencias/{{ocorrenciaId}}"
+          }
+        },
+        {
+          "name": "[Admin] Status -> Em Andamento",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Em Andamento\"\n}"
+            },
+            "url": "{{baseUrl}}/ocorrencias/{{ocorrenciaId}}/status"
+          }
+        },
+        {
+          "name": "[Admin] Status -> Resolvido SEM patrimônio (400)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Resolvido\"\n}"
+            },
+            "url": "{{baseUrl}}/ocorrencias/{{ocorrenciaId}}/status"
+          }
+        },
+        {
+          "name": "[Admin] Status -> Resolvido COM patrimônio",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Resolvido\",\n  \"numero_patrimonio\": \"200010\"\n}"
+            },
+            "url": "{{baseUrl}}/ocorrencias/{{ocorrenciaId}}/status"
+          }
+        },
+        {
+          "name": "[Admin] Reabrir ocorrência",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Aberto\"\n}"
+            },
+            "url": "{{baseUrl}}/ocorrencias/{{ocorrenciaId}}/status"
+          }
+        },
+        {
+          "name": "[Admin] Excluir ocorrência",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/ocorrencias/{{ocorrenciaId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Comentários",
+      "item": [
+        {
+          "name": "Comentar (aluno, professor ou admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"texto\": \"Mensagem de teste.\"\n}"
+            },
+            "url": "{{baseUrl}}/ocorrencias/{{ocorrenciaId}}/comentarios"
+          }
+        },
+        {
+          "name": "Listar comentários",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/ocorrencias/{{ocorrenciaId}}/comentarios"
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Painel",
+      "item": [
+        {
+          "name": "Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/dashboard"
+          }
+        }
+      ]
+    }
+  ]
+}
